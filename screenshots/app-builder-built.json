@@ -1,0 +1,43 @@
+{
+  "url": "http://127.0.0.1:8081/",
+  "viewports": {
+    "desktop": {
+      "width": 1280,
+      "height": 800,
+      "status": 200,
+      "title": "ATS Align",
+      "hasCanvas": false,
+      "bodyTextLen": 1380,
+      "bodyTextHash": "5b1fa8d48a73d13261389f112f66f07293af9fd8c16c478fcd6fabceb320faff",
+      "bodyTextPrefix": "ATS Align Resume to job · search & align Pipeline Job Search API",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-built.png"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "status": 200,
+      "title": "ATS Align",
+      "hasCanvas": false,
+      "bodyTextLen": 1340,
+      "bodyTextHash": "c4f30f1408eb3b3916d2720c8ce31ed90d60eaf25c2317d0d5e549492f951265",
+      "bodyTextPrefix": "ATS Align Pipeline Job Search Align the resume you already have ",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-built-mobile.png"
+    }
+  },
+  "brandWarnings": [
+    "BRAND NOTE: no custom public/og.jpg — the platform will serve the og.grok.me placeholder. Custom cards are the default for games of every kind (DOM board/word games included), whimsical apps, creative tools, and brand-forward pages — only plain utilities (converters, CRUD trackers, admin dashboards) keep the placeholder. If this app is not a plain utility, finish the brand-asset pass per /workspace/.grok/skills/og/SKILL.md."
+  ],
+  "authWarnings": [],
+  "verdictFile": "/workspace/screenshots/app-builder-built.json",
+  "divergesFromBaseline": true,
+  "baselineReasons": [
+    "desktop: body text changed (1005 -> 1380 chars, hash mismatch)",
+    "mobile: body text changed (965 -> 1340 chars, hash mismatch)"
+  ]
+}

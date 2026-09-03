@@ -1,0 +1,40 @@
+{
+  "url": "http://127.0.0.1:8080/",
+  "viewports": {
+    "desktop": {
+      "width": 1280,
+      "height": 800,
+      "status": 200,
+      "title": "ATS Align",
+      "hasCanvas": false,
+      "bodyTextLen": 1005,
+      "bodyTextHash": "1ffc8e52b7de6e0b43c31fc586a66432c47321287df36dacc5cb32ce0a934d5a",
+      "bodyTextPrefix": "ATS Align Resume to job · search & align Pipeline Job Search API",
+      "horizontalOverflow": false,
+      "consoleErrors": [
+        "A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:\n\n- A server/client branch `if (typeof window !== 'undefined')`.\n- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.\n- Date formatting in a user's locale which doesn't match the server.\n- External changing data without sending a snapshot of it along with the HTML.\n- Invalid HTML tag nesting.\n\nIt can also happen if the client has a browser extension installed which messes with the HTML before React loaded.\n\n%s%s https://react.dev/link/hydration-mismatch \n\n  ...\n    <Lazy>\n      <Home>\n        <HomePage>\n          <TooltipProvider delayDuration={200}>\n            <TooltipProviderProvider scope={undefined} isOpenDelayedRef={{current:true}} delayDuration={200} ...>\n              <div className=\"min-h-dvh ...\">\n                <header>\n                <main className=\"mx-auto fl...\">\n                  <section>\n                  <div className=\"grid items...\">\n                    <_c>\n                      <div ref={null} className=\"rounded-3x...\">\n                        <_c3>\n                        <_c9 className=\"flex flex-...\">\n                          <div ref={null} className=\"p-4 pt-0 f...\">\n                            <div className=\"flex flex-...\">\n                              <_c>\n                              <div className=\"relative\">\n                                <_c id=\"job-url\" type=\"url\" inputMode=\"url\" placeholder=\"https://…\" value=\"\" ...>\n                                  <input\n                                    type=\"url\"\n                                    className=\"flex h-11 w-full rounded-lg bg-secondary px-3 py-2 text-sm text-foregro...\"\n                                    ref={null}\n                                    id=\"job-url\"\n                                    inputMode=\"url\"\n                                    placeholder=\"https://…\"\n                                    value=\"\"\n                                    onChange={function onChange}\n                                    disabled={false}\n-                                   style={{caret-color:\"transparent\"}}\n                                  >\n                            <div className=\"flex flex-...\">\n                              <_c>\n                              <div className=\"relative\">\n                                <_c id=\"job-text\" value=\"\" onChange={function onChange} disabled={false} ...>\n                                  <textarea\n                                    className=\"flex w-full rounded-lg bg-secondary px-3 py-3 text-sm text-foreground s...\"\n                                    ref={null}\n                                    id=\"job-text\"\n                                    value=\"\"\n                                    onChange={function onChange}\n                                    disabled={false}\n                                    placeholder=\"Optional. Paste the posting if the page cannot be fetched.\"\n-                                   style={{caret-color:\"transparent\"}}\n                                  >\n                            <div className=\"flex flex-...\">\n                              <div className=\"flex flex-...\">\n                                <_c>\n                                <div>\n                                <input\n                                  ref={{current:null}}\n                                  type=\"file\"\n                                  accept=\".html,.htm,text/html\"\n                                  className=\"hidden\"\n                                  onChange={function onChange}\n-                                 style={{caret-color:\"transparent\"}}\n                                >\n                              <div className=\"relative\">\n                                <_c id=\"resume-html\" value=\"\" onChange={function onChange} disabled={false} ...>\n                                  <textarea\n                                    className=\"flex w-full rounded-lg bg-secondary px-3 py-3 text-foreground shadow-[v...\"\n                                    ref={null}\n                                    id=\"resume-html\"\n                                    value=\"\"\n                                    onChange={function onChange}\n                                    disabled={false}\n                                    placeholder=\"Paste the full HTML of your resume, including style tags.\"\n-                                   style={{caret-color:\"transparent\"}}\n                                  >\n                              ...\n                            ...\n                    ...\n              ...\n"
+      ],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-preview.png"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "status": 200,
+      "title": "ATS Align",
+      "hasCanvas": false,
+      "bodyTextLen": 965,
+      "bodyTextHash": "269129c682f9aa22b70fc73e1956a9a59f15a485929dee4c780c0b1aae6b7f1d",
+      "bodyTextPrefix": "ATS Align Pipeline Job Search Align the resume you already have ",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-preview-mobile.png"
+    }
+  },
+  "brandWarnings": [
+    "BRAND NOTE: no custom public/og.jpg — the platform will serve the og.grok.me placeholder. Custom cards are the default for games of every kind (DOM board/word games included), whimsical apps, creative tools, and brand-forward pages — only plain utilities (converters, CRUD trackers, admin dashboards) keep the placeholder. If this app is not a plain utility, finish the brand-asset pass per /workspace/.grok/skills/og/SKILL.md."
+  ],
+  "authWarnings": [],
+  "verdictFile": "/workspace/screenshots/app-builder-preview.json"
+}
