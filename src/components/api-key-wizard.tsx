@@ -1,5 +1,4 @@
-import { useState, useRef, type ReactNode, type TouchEvent } from "react";
-import { createPortal } from "react-dom";
+import { useState, useRef, type ReactNode, type TouchEvent, type MouseEvent } from "react";
 import {
   Dialog,
   DialogContent,
@@ -152,12 +151,6 @@ export function ApiKeyWizard({ open, onComplete, onClose, theme = "dark", onTogg
     setStep(6);
   }
 
-  function closeFullscreen(e?: React.MouseEvent | React.PointerEvent) {
-    e?.stopPropagation();
-    e?.preventDefault();
-    setFullscreen(false);
-  }
-
   function onTouchStart(e: TouchEvent) {
     if (fullscreen) return;
     const t = e.touches[0];
@@ -192,231 +185,221 @@ export function ApiKeyWizard({ open, onComplete, onClose, theme = "dark", onTogg
     }
   }
 
-  const fullscreenOverlay =
-    fullscreen && current.media && current.mediaType
-      ? createPortal(
+  function handleBackdropClick(e: MouseEvent<HTMLDivElement>) {
+    // Only close when clicking the dark backdrop, not the media itself
+    if (e.target === e.currentTarget) {
+      setFullscreen(false);
+    }
+  }
+
+  return (
+    <Dialog
+      open={open}
+      onOpenChange={(next) => {
+        if (!next && fullscreen) {
+          setFullscreen(false);
+          return;
+        }
+        if (!next) onClose();
+      }}
+    >
+      <DialogContent
+        className="relative flex h-[min(92vh,900px)] w-[calc(100%-1rem)] max-w-4xl flex-col gap-0 overflow-hidden p-0 sm:w-[calc(100%-2rem)]"
+        showCloseButton={false}
+        onTouchStart={onTouchStart}
+        onTouchEnd={onTouchEnd}
+        onTouchMove={onTouchMove}
+        onEscapeKeyDown={(e) => {
+          if (fullscreen) {
+            e.preventDefault();
+            setFullscreen(false);
+          }
+        }}
+        style={{ touchAction: "pan-y" }}
+      >
+        <DialogHeader className="shrink-0 border-b border-border px-4 py-3 sm:px-6">
+          <div className="flex items-center justify-between gap-2 pr-0">
+            <DialogTitle className="text-base sm:text-xl">How to Get Your API Key</DialogTitle>
+            {onToggleTheme ? (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-9 w-9 shrink-0 p-0"
+                onClick={onToggleTheme}
+                aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+              >
+                {theme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}
+              </Button>
+            ) : null}
+          </div>
+        </DialogHeader>
+
+        <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto p-4 sm:gap-4 sm:p-6">
+          <div className="relative aspect-video w-full shrink-0 overflow-hidden rounded-xl border border-border bg-muted">
+            {current.media && current.mediaType ? (
+              current.mediaType === "video" ? (
+                <video
+                  src={current.media}
+                  className="size-full object-contain"
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                />
+              ) : (
+                <img src={current.media} alt="" className="size-full object-contain" />
+              )
+            ) : (
+              <div className="flex size-full items-center justify-center text-sm text-muted-foreground">
+                Enter your key below
+              </div>
+            )}
+            <span className="absolute left-2 top-2 rounded-full bg-primary px-2 py-0.5 text-xs font-semibold text-primary-foreground">
+              Step {step + 1}
+            </span>
+            {current.media ? (
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                className="absolute right-2 top-2 h-8 w-8 p-0"
+                onClick={() => setFullscreen(true)}
+                aria-label="View full screen"
+              >
+                <Search className="size-4" />
+              </Button>
+            ) : null}
+          </div>
+
+          <div className="shrink-0">
+            <div className="flex items-baseline justify-between gap-2">
+              <h3 className="font-display text-base font-medium sm:text-lg">{current.title}</h3>
+              <span className="whitespace-nowrap text-xs text-muted-foreground sm:text-sm">
+                Step {step + 1} of {STEPS.length}
+              </span>
+            </div>
+            <div className="mt-1 text-sm text-muted-foreground">{current.body}</div>
+          </div>
+
+          {showKeyField ? (
+            <div className="shrink-0 space-y-2">
+              <Label htmlFor="wizard-key">Your API Key</Label>
+              <Input
+                id="wizard-key"
+                type="password"
+                autoComplete="off"
+                placeholder="AIza…"
+                value={draft}
+                onChange={(e) => setDraft(e.target.value)}
+              />
+            </div>
+          ) : null}
+
+          <div className="flex shrink-0 flex-wrap gap-2">
+            <Button
+              className="h-11 flex-1"
+              onClick={() => window.open(AISTUDIO, "_blank", "noopener,noreferrer")}
+            >
+              Get my API key
+            </Button>
+            <Button variant="outline" className="h-11 flex-1" onClick={goToEnterKey}>
+              Enter my API key
+            </Button>
+            {isLast ? (
+              <Button className="h-11 w-full sm:w-auto sm:flex-none" onClick={handleSave}>
+                Save
+              </Button>
+            ) : null}
+          </div>
+
+          <div className="mt-auto flex shrink-0 flex-col gap-3 pt-1">
+            <div className="flex items-center justify-between gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-11"
+                disabled={step === 0}
+                onClick={() => setStep((s) => s - 1)}
+              >
+                <ChevronLeft className="size-4" /> Prev
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-11"
+                disabled={isLast}
+                onClick={() => setStep((s) => s + 1)}
+              >
+                Next <ChevronRight className="size-4" />
+              </Button>
+            </div>
+
+            <div className="space-y-2">
+              <Progress value={progressValue} className="h-2" />
+              <div className="flex flex-wrap justify-between gap-x-1 gap-y-1">
+                {STEPS.map((s, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => setStep(i)}
+                    className={`text-[10px] sm:text-xs transition-colors ${
+                      i === step
+                        ? "font-bold text-primary"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                    aria-label={`Go to step ${i + 1}: ${s.title}`}
+                    aria-current={i === step ? "step" : undefined}
+                  >
+                    {s.shortLabel}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Fullscreen media — inside dialog so wizard stays open */}
+        {fullscreen && current.media && current.mediaType ? (
           <div
-            className="fixed inset-0 z-[200] flex items-center justify-center bg-black/90 p-4"
-            onClick={closeFullscreen}
-            onPointerDown={(e) => e.stopPropagation()}
-            onMouseDown={(e) => e.stopPropagation()}
+            className="absolute inset-0 z-50 flex items-center justify-center bg-black/95 p-4"
+            onClick={handleBackdropClick}
             role="dialog"
             aria-modal="true"
             aria-label="Full screen media"
           >
-            <Button
+            <button
               type="button"
-              variant="ghost"
-              size="sm"
-              className="absolute right-4 top-4 z-10 h-10 w-10 p-0 text-white hover:bg-white/20"
-              onClick={closeFullscreen}
+              className="absolute right-3 top-3 z-10 flex h-11 w-11 items-center justify-center rounded-lg text-white hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+              onClick={() => setFullscreen(false)}
               aria-label="Close full screen"
             >
               <X className="size-6" />
-            </Button>
-            <div
-              className="max-h-full max-w-full"
-              onClick={(e) => e.stopPropagation()}
-              onPointerDown={(e) => e.stopPropagation()}
-            >
+            </button>
+            <div className="max-h-full max-w-full">
               {current.mediaType === "video" ? (
                 <video
                   src={current.media}
-                  className="max-h-[90vh] max-w-full object-contain"
+                  className="max-h-full max-w-full object-contain"
                   autoPlay
                   muted
                   loop
                   playsInline
                   controls
+                  onClick={(e) => e.stopPropagation()}
                 />
               ) : (
                 <img
                   src={current.media}
                   alt=""
-                  className="max-h-[90vh] max-w-full object-contain"
+                  className="max-h-full max-w-full object-contain"
+                  onClick={(e) => e.stopPropagation()}
                 />
               )}
-            </div>
-          </div>,
-          document.body,
-        )
-      : null;
-
-  return (
-    <>
-      <Dialog
-        open={open}
-        onOpenChange={(next) => {
-          // Never close the wizard while fullscreen media is open
-          if (!next && fullscreen) return;
-          if (!next) onClose();
-        }}
-      >
-        <DialogContent
-          className="flex h-[min(92vh,900px)] w-[calc(100%-1rem)] max-w-4xl flex-col gap-0 overflow-hidden p-0 sm:w-[calc(100%-2rem)]"
-          showCloseButton={false}
-          onTouchStart={onTouchStart}
-          onTouchEnd={onTouchEnd}
-          onTouchMove={onTouchMove}
-          onPointerDownOutside={(e) => {
-            if (fullscreen) e.preventDefault();
-          }}
-          onInteractOutside={(e) => {
-            if (fullscreen) e.preventDefault();
-          }}
-          onEscapeKeyDown={(e) => {
-            if (fullscreen) {
-              e.preventDefault();
-              setFullscreen(false);
-            }
-          }}
-          style={{ touchAction: "pan-y" }}
-        >
-          <DialogHeader className="shrink-0 border-b border-border px-4 py-3 sm:px-6">
-            <div className="flex items-center justify-between gap-2 pr-0">
-              <DialogTitle className="text-base sm:text-xl">How to Get Your API Key</DialogTitle>
-              {onToggleTheme ? (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="h-9 w-9 shrink-0 p-0"
-                  onClick={onToggleTheme}
-                  aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-                >
-                  {theme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}
-                </Button>
-              ) : null}
-            </div>
-          </DialogHeader>
-
-          <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto p-4 sm:gap-4 sm:p-6">
-            <div className="relative aspect-video w-full shrink-0 overflow-hidden rounded-xl border border-border bg-muted">
-              {current.media && current.mediaType ? (
-                current.mediaType === "video" ? (
-                  <video
-                    src={current.media}
-                    className="size-full object-contain"
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                  />
-                ) : (
-                  <img src={current.media} alt="" className="size-full object-contain" />
-                )
-              ) : (
-                <div className="flex size-full items-center justify-center text-sm text-muted-foreground">
-                  Enter your key below
-                </div>
-              )}
-              <span className="absolute left-2 top-2 rounded-full bg-primary px-2 py-0.5 text-xs font-semibold text-primary-foreground">
-                Step {step + 1}
-              </span>
-              {current.media ? (
-                <Button
-                  type="button"
-                  variant="secondary"
-                  size="sm"
-                  className="absolute right-2 top-2 h-8 w-8 p-0"
-                  onClick={() => setFullscreen(true)}
-                  aria-label="View full screen"
-                >
-                  <Search className="size-4" />
-                </Button>
-              ) : null}
-            </div>
-
-            <div className="shrink-0">
-              <div className="flex items-baseline justify-between gap-2">
-                <h3 className="font-display text-base font-medium sm:text-lg">{current.title}</h3>
-                <span className="whitespace-nowrap text-xs text-muted-foreground sm:text-sm">
-                  Step {step + 1} of {STEPS.length}
-                </span>
-              </div>
-              <div className="mt-1 text-sm text-muted-foreground">{current.body}</div>
-            </div>
-
-            {showKeyField ? (
-              <div className="shrink-0 space-y-2">
-                <Label htmlFor="wizard-key">Your API Key</Label>
-                <Input
-                  id="wizard-key"
-                  type="password"
-                  autoComplete="off"
-                  placeholder="AIza…"
-                  value={draft}
-                  onChange={(e) => setDraft(e.target.value)}
-                />
-              </div>
-            ) : null}
-
-            <div className="flex shrink-0 flex-wrap gap-2">
-              <Button
-                className="h-11 flex-1"
-                onClick={() => window.open(AISTUDIO, "_blank", "noopener,noreferrer")}
-              >
-                Get my API key
-              </Button>
-              <Button variant="outline" className="h-11 flex-1" onClick={goToEnterKey}>
-                Enter my API key
-              </Button>
-              {isLast ? (
-                <Button className="h-11 w-full sm:w-auto sm:flex-none" onClick={handleSave}>
-                  Save
-                </Button>
-              ) : null}
-            </div>
-
-            <div className="mt-auto flex shrink-0 flex-col gap-3 pt-1">
-              <div className="flex items-center justify-between gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-11"
-                  disabled={step === 0}
-                  onClick={() => setStep((s) => s - 1)}
-                >
-                  <ChevronLeft className="size-4" /> Prev
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-11"
-                  disabled={isLast}
-                  onClick={() => setStep((s) => s + 1)}
-                >
-                  Next <ChevronRight className="size-4" />
-                </Button>
-              </div>
-
-              <div className="space-y-2">
-                <Progress value={progressValue} className="h-2" />
-                <div className="flex flex-wrap justify-between gap-x-1 gap-y-1">
-                  {STEPS.map((s, i) => (
-                    <button
-                      key={i}
-                      type="button"
-                      onClick={() => setStep(i)}
-                      className={`text-[10px] sm:text-xs transition-colors ${
-                        i === step
-                          ? "font-bold text-primary"
-                          : "text-muted-foreground hover:text-foreground"
-                      }`}
-                      aria-label={`Go to step ${i + 1}: ${s.title}`}
-                      aria-current={i === step ? "step" : undefined}
-                    >
-                      {s.shortLabel}
-                    </button>
-                  ))}
-                </div>
-              </div>
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
-
-      {fullscreenOverlay}
-    </>
+        ) : null}
+      </DialogContent>
+    </Dialog>
   );
 }
