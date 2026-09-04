@@ -10,8 +10,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
-import { saveApiKey, isPlausibleApiKey } from "@/lib/api-key-store";
-import { toast } from "sonner";
 import { ChevronLeft, ChevronRight, Moon, Sun, Search, X } from "lucide-react";
 
 const AISTUDIO = "https://aistudio.google.com/apikey";
@@ -31,55 +29,25 @@ const STEPS: Step[] = [
     shortLabel: "Open",
     body: (
       <>
-        Click the <strong>Get my API key</strong> button below. A new tab will open with the Google AI Studio API keys page.
+        Go to{" "}
+        <a href={AISTUDIO} target="_blank" rel="noopener noreferrer" className="underline">
+          aistudio.google.com/apikey
+        </a>{" "}
+        and sign in with your Google account.
       </>
     ),
     media: "/wizard/getapivid.mp4",
     mediaType: "video",
   },
   {
-    title: "Create API key and project",
+    title: "Create API key",
     shortLabel: "Create",
-    body: (
-      <>
-        Click <strong>Create API key</strong> at the top right. A popup will appear asking for a name — call it anything you want or leave it as is — and <strong>Choose an imported project</strong>.
-        <ul className="mt-2 list-disc pl-4">
-          <li>
-            Select <strong>Create project</strong> to make a new one.
-          </li>
-          <li>
-            In <strong>Name your project</strong>, name it anything you want or leave it as is.
-          </li>
-        </ul>
-      </>
-    ),
+    body: "Click Create API key. Choose an existing Google Cloud project or create a new one when prompted.",
     media: "/wizard/step001.png",
     mediaType: "img",
   },
   {
-    title: "Create the project",
-    shortLabel: "Project",
-    body: (
-      <>
-        Click <strong>Create project</strong>. Let it load; it will return you to the previous prompt.
-      </>
-    ),
-    media: "/wizard/step001.png",
-    mediaType: "img",
-  },
-  {
-    title: "Create the key",
-    shortLabel: "Key",
-    body: (
-      <>
-        Click <strong>Create key</strong>. Let it load; you will now see your API key.
-      </>
-    ),
-    media: "/wizard/step001.png",
-    mediaType: "img",
-  },
-  {
-    title: "Copy your API key",
+    title: "Copy your key",
     shortLabel: "Copy",
     body: (
       <>
@@ -92,22 +60,32 @@ const STEPS: Step[] = [
   {
     title: "Return here",
     shortLabel: "Return",
-    body: (
-      <>
-        Return to this tab and continue to paste your key.
-      </>
-    ),
-    media: "/wizard/step001.png",
-    mediaType: "img",
+    body: "Come back to this wizard. You will paste the key in a moment.",
+    media: null,
+    mediaType: null,
   },
   {
-    title: "Paste & save your key",
-    shortLabel: "Save",
+    title: "Paste and save",
+    shortLabel: "Paste",
     body: (
       <>
         Paste your key into the text field labeled <strong>Your API Key</strong>, then click <strong>Save</strong>.
       </>
     ),
+    media: null,
+    mediaType: null,
+  },
+  {
+    title: "You are set",
+    shortLabel: "Done",
+    body: "Your key is stored locally in this browser. You can change or clear it later from the app settings.",
+    media: null,
+    mediaType: null,
+  },
+  {
+    title: "Enter API key",
+    shortLabel: "Key",
+    body: "Paste the API key you copied from Google AI Studio.",
     media: null,
     mediaType: null,
   },
@@ -132,20 +110,13 @@ export function ApiKeyWizard({ open, onComplete, onClose, theme = "dark", onTogg
 
   const current = STEPS[step];
   const isLast = step === STEPS.length - 1;
-  const showKeyField = step >= 6;
+  const showKeyField = step === 6 || isLast;
   const progressValue = ((step + 1) / STEPS.length) * 100;
 
   function handleSave() {
-    const key = draft.trim();
-    if (!isPlausibleApiKey(key)) {
-      toast.error("Gemini key does not look valid.");
-      return;
-    }
-    saveApiKey(key);
-    onComplete(key);
-    toast.success("API key saved. You’re ready to use the app.");
-    setStep(0);
-    setDraft("");
+    const k = draft.trim();
+    if (!k) return;
+    onComplete(k);
   }
 
   function goToEnterKey() {
@@ -216,6 +187,7 @@ export function ApiKeyWizard({ open, onComplete, onClose, theme = "dark", onTogg
                 size="sm"
                 className="h-9 w-9 shrink-0 p-0"
                 onClick={onToggleTheme}
+                disabled={fullscreen}
                 aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
               >
                 {theme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}
@@ -231,22 +203,22 @@ export function ApiKeyWizard({ open, onComplete, onClose, theme = "dark", onTogg
               current.mediaType === "video" ? (
                 <video
                   src={current.media}
-                  className="size-full object-contain"
+                  className="size-full object-cover"
                   autoPlay
                   muted
                   loop
                   playsInline
                 />
               ) : (
-                <img src={current.media} alt="" className="size-full object-contain" />
+                <img src={current.media} alt="" className="size-full object-cover" />
               )
             ) : (
               <div className="flex size-full items-center justify-center text-sm text-muted-foreground">
-                Enter your key below
+                No preview
               </div>
             )}
             <span className="absolute left-2 top-2 rounded-full bg-primary px-2 py-0.5 text-xs font-semibold text-primary-foreground">
-              Step {step + 1}
+              {step + 1}/{STEPS.length}
             </span>
             {current.media ? (
               <Button
@@ -326,7 +298,6 @@ export function ApiKeyWizard({ open, onComplete, onClose, theme = "dark", onTogg
                 Next <ChevronRight className="size-4" />
               </Button>
             </div>
-
             <div className="space-y-2">
               <Progress value={progressValue} className="h-2" />
               <div className="flex flex-wrap justify-between gap-x-1 gap-y-1">
@@ -356,8 +327,21 @@ export function ApiKeyWizard({ open, onComplete, onClose, theme = "dark", onTogg
       {fullscreen && current.media && current.mediaType ? (
         <DialogPortal>
           <div
-            className="fixed inset-0 z-[200] flex items-center justify-center bg-black/90 p-4"
-            onClick={() => setFullscreen(false)}
+            className="fixed inset-0 z-[200] flex items-center justify-center bg-black/90 p-4 pointer-events-auto"
+            onPointerDown={(e) => {
+              if (e.target === e.currentTarget) {
+                e.preventDefault();
+                e.stopPropagation();
+                setFullscreen(false);
+              }
+            }}
+            onClick={(e) => {
+              if (e.target === e.currentTarget) {
+                e.preventDefault();
+                e.stopPropagation();
+                setFullscreen(false);
+              }
+            }}
             role="dialog"
             aria-modal="true"
             aria-label="Full screen media"
@@ -366,8 +350,14 @@ export function ApiKeyWizard({ open, onComplete, onClose, theme = "dark", onTogg
               type="button"
               variant="ghost"
               size="sm"
-              className="absolute right-4 top-4 z-[210] h-10 w-10 p-0 text-white hover:bg-white/20"
+              className="absolute right-4 top-4 z-[210] h-12 w-12 p-0 text-white hover:bg-white/20 pointer-events-auto"
+              onPointerDown={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setFullscreen(false);
+              }}
               onClick={(e) => {
+                e.preventDefault();
                 e.stopPropagation();
                 setFullscreen(false);
               }}
@@ -375,7 +365,11 @@ export function ApiKeyWizard({ open, onComplete, onClose, theme = "dark", onTogg
             >
               <X className="size-6" />
             </Button>
-            <div className="max-h-full max-w-full" onClick={(e) => e.stopPropagation()}>
+            <div
+              className="max-h-full max-w-full pointer-events-auto"
+              onPointerDown={(e) => e.stopPropagation()}
+              onClick={(e) => e.stopPropagation()}
+            >
               {current.mediaType === "video" ? (
                 <video
                   src={current.media}
