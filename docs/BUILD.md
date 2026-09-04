@@ -27,7 +27,7 @@ See `src/lib/pipeline-types.ts` (`API_KEY_STORAGE`, `SEARCH_API_KEY_STORAGE`, `D
 - `public/wizard/step004.png` (step 4)
 - `public/wizard/step005.png` (step 5)
 - `public/wizard/step006.png` (step 6)
-- step 7: no media
+- `public/wizard/step007.png` (step 7)
 
 ## Reset
 
