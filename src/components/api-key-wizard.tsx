@@ -4,6 +4,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogPortal,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -351,45 +352,50 @@ export function ApiKeyWizard({ open, onComplete, onClose, theme = "dark", onTogg
         </div>
       </DialogContent>
 
-      {/* Fullscreen media overlay */}
+      {/* Fullscreen media overlay — portaled so it sits above Dialog on mobile */}
       {fullscreen && current.media && current.mediaType ? (
-        <div
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 p-4"
-          onClick={() => setFullscreen(false)}
-          role="dialog"
-          aria-modal="true"
-          aria-label="Full screen media"
-        >
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            className="absolute right-4 top-4 h-10 w-10 p-0 text-white hover:bg-white/20"
+        <DialogPortal>
+          <div
+            className="fixed inset-0 z-[200] flex items-center justify-center bg-black/90 p-4"
             onClick={() => setFullscreen(false)}
-            aria-label="Close full screen"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Full screen media"
           >
-            <X className="size-6" />
-          </Button>
-          <div className="max-h-full max-w-full" onClick={(e) => e.stopPropagation()}>
-            {current.mediaType === "video" ? (
-              <video
-                src={current.media}
-                className="max-h-[90vh] max-w-full object-contain"
-                autoPlay
-                muted
-                loop
-                playsInline
-                controls
-              />
-            ) : (
-              <img
-                src={current.media}
-                alt=""
-                className="max-h-[90vh] max-w-full object-contain"
-              />
-            )}
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="absolute right-4 top-4 z-[210] h-10 w-10 p-0 text-white hover:bg-white/20"
+              onClick={(e) => {
+                e.stopPropagation();
+                setFullscreen(false);
+              }}
+              aria-label="Close full screen"
+            >
+              <X className="size-6" />
+            </Button>
+            <div className="max-h-full max-w-full" onClick={(e) => e.stopPropagation()}>
+              {current.mediaType === "video" ? (
+                <video
+                  src={current.media}
+                  className="max-h-[90vh] max-w-full object-contain"
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  controls
+                />
+              ) : (
+                <img
+                  src={current.media}
+                  alt=""
+                  className="max-h-[90vh] max-w-full object-contain"
+                />
+              )}
+            </div>
           </div>
-        </div>
+        </DialogPortal>
       ) : null}
     </Dialog>
   );
