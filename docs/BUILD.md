@@ -21,8 +21,13 @@ See `src/lib/pipeline-types.ts` (`API_KEY_STORAGE`, `SEARCH_API_KEY_STORAGE`, `D
 
 ## Wizard media
 
-- `public/wizard/getapivid.mp4`
-- `public/wizard/step001.png`
+- `public/wizard/getapivid.mp4` (step 1)
+- `public/wizard/step002.png` (step 2)
+- `public/wizard/step003.png` (step 3)
+- `public/wizard/step004.png` (step 4)
+- `public/wizard/step005.png` (step 5)
+- `public/wizard/step006.png` (step 6)
+- step 7: no media
 
 ## Reset
 
