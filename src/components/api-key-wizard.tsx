@@ -106,8 +106,8 @@ const STEPS: Step[] = [
         Paste your key into the text field labeled <strong>Your API Key</strong>, then click <strong>Save</strong>.
       </>
     ),
-    media: null,
-    mediaType: null,
+    media: "/wizard/step007.png",
+    mediaType: "img",
   },
 ];
 
