@@ -96,7 +96,8 @@ export function HomePage() {
   const [showWelcome, setShowWelcome] = useState(false);
   const [showWizard, setShowWizard] = useState(false);
   const [apiKeyDialogOpen, setApiKeyDialogOpen] = useState(false);
-  const [apiKeyDialogFromWizard, setApiKeyDialogFromWizard] = useState(false);
+  /** Where "Return to set up" should go. null = opened from nav → show "Set up Keys". */
+  const [apiKeyDialogReturnTo, setApiKeyDialogReturnTo] = useState<"welcome" | "wizard" | null>(null);
 
   const busy = running || rewriting || customizing || generatingCover || convertingPdf;
 
@@ -192,17 +193,19 @@ export function HomePage() {
                 open={apiKeyDialogOpen}
                 onOpenChange={(open) => {
                   setApiKeyDialogOpen(open);
-                  if (!open) setApiKeyDialogFromWizard(false);
+                  if (!open) setApiKeyDialogReturnTo(null);
                 }}
-                fromWizard={apiKeyDialogFromWizard}
+                fromWizard={apiKeyDialogReturnTo !== null}
                 onReturnToSetup={() => {
+                  const back = apiKeyDialogReturnTo;
                   setApiKeyDialogOpen(false);
-                  setApiKeyDialogFromWizard(false);
-                  setShowWizard(true);
+                  setApiKeyDialogReturnTo(null);
+                  if (back === "wizard") setShowWizard(true);
+                  else setShowWelcome(true);
                 }}
                 onStartSetup={() => {
                   setApiKeyDialogOpen(false);
-                  setApiKeyDialogFromWizard(false);
+                  setApiKeyDialogReturnTo(null);
                   setShowWelcome(true);
                 }}
               />
@@ -374,7 +377,7 @@ export function HomePage() {
           }}
           onEnterKey={() => {
             setShowWelcome(false);
-            setApiKeyDialogFromWizard(false);
+            setApiKeyDialogReturnTo("welcome");
             setApiKeyDialogOpen(true);
           }}
           theme={theme}
@@ -391,7 +394,7 @@ export function HomePage() {
           onToggleTheme={toggleTheme}
           onEnterApiKey={() => {
             setShowWizard(false);
-            setApiKeyDialogFromWizard(true);
+            setApiKeyDialogReturnTo("wizard");
             setApiKeyDialogOpen(true);
           }}
         />
