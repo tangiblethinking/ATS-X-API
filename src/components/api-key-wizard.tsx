@@ -51,7 +51,7 @@ const STEPS: Step[] = [
         </ul>
       </>
     ),
-    media: "/wizard/step001.png",
+    media: "/wizard/step002.png",
     mediaType: "img",
   },
   {
@@ -62,7 +62,7 @@ const STEPS: Step[] = [
         Click <strong>Create project</strong>. Let it load; it will return you to the previous prompt.
       </>
     ),
-    media: "/wizard/step001.png",
+    media: "/wizard/step003.png",
     mediaType: "img",
   },
   {
@@ -73,7 +73,7 @@ const STEPS: Step[] = [
         Click <strong>Create key</strong>. Let it load; you will now see your API key.
       </>
     ),
-    media: "/wizard/step001.png",
+    media: "/wizard/step004.png",
     mediaType: "img",
   },
   {
@@ -84,7 +84,7 @@ const STEPS: Step[] = [
         Click the <strong>copy icon</strong> on the right of the API key text to copy it to your clipboard.
       </>
     ),
-    media: "/wizard/step001.png",
+    media: "/wizard/step005.png",
     mediaType: "img",
   },
   {
@@ -95,7 +95,7 @@ const STEPS: Step[] = [
         Return to this tab and continue to paste your key.
       </>
     ),
-    media: "/wizard/step001.png",
+    media: "/wizard/step006.png",
     mediaType: "img",
   },
   {
