@@ -1,4 +1,4 @@
-import { useState, useRef, type ReactNode, type TouchEvent, type MouseEvent } from "react";
+import { useState, useRef, type ReactNode, type TouchEvent } from "react";
 import {
   Dialog,
   DialogContent,
@@ -152,14 +152,12 @@ export function ApiKeyWizard({ open, onComplete, onClose, theme = "dark", onTogg
   }
 
   function onTouchStart(e: TouchEvent) {
-    if (fullscreen) return;
     const t = e.touches[0];
     touchStartX.current = t.clientX;
     touchStartY.current = t.clientY;
   }
 
   function onTouchEnd(e: TouchEvent) {
-    if (fullscreen) return;
     if (touchStartX.current == null || touchStartY.current == null) return;
     const t = e.changedTouches[0];
     const dx = t.clientX - touchStartX.current;
@@ -167,6 +165,7 @@ export function ApiKeyWizard({ open, onComplete, onClose, theme = "dark", onTogg
     touchStartX.current = null;
     touchStartY.current = null;
 
+    // Prefer horizontal swipe; ignore mostly-vertical gestures (scroll)
     if (Math.abs(dx) < SWIPE_THRESHOLD || Math.abs(dx) < Math.abs(dy)) return;
 
     e.preventDefault();
@@ -175,20 +174,13 @@ export function ApiKeyWizard({ open, onComplete, onClose, theme = "dark", onTogg
   }
 
   function onTouchMove(e: TouchEvent) {
-    if (fullscreen) return;
     if (touchStartX.current == null || touchStartY.current == null) return;
     const t = e.touches[0];
     const dx = t.clientX - touchStartX.current;
     const dy = t.clientY - touchStartY.current;
+    // Block browser back/forward when horizontal swipe is dominant
     if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 10) {
       e.preventDefault();
-    }
-  }
-
-  function handleBackdropClick(e: MouseEvent<HTMLDivElement>) {
-    // Only close when clicking the dark backdrop, not the media itself
-    if (e.target === e.currentTarget) {
-      setFullscreen(false);
     }
   }
 
@@ -196,25 +188,15 @@ export function ApiKeyWizard({ open, onComplete, onClose, theme = "dark", onTogg
     <Dialog
       open={open}
       onOpenChange={(next) => {
-        if (!next && fullscreen) {
-          setFullscreen(false);
-          return;
-        }
         if (!next) onClose();
       }}
     >
       <DialogContent
-        className="relative flex h-[min(92vh,900px)] w-[calc(100%-1rem)] max-w-4xl flex-col gap-0 overflow-hidden p-0 sm:w-[calc(100%-2rem)]"
+        className="flex h-[min(92vh,900px)] w-[calc(100%-1rem)] max-w-4xl flex-col gap-0 overflow-hidden p-0 sm:w-[calc(100%-2rem)]"
         showCloseButton={false}
         onTouchStart={onTouchStart}
         onTouchEnd={onTouchEnd}
         onTouchMove={onTouchMove}
-        onEscapeKeyDown={(e) => {
-          if (fullscreen) {
-            e.preventDefault();
-            setFullscreen(false);
-          }
-        }}
         style={{ touchAction: "pan-y" }}
       >
         <DialogHeader className="shrink-0 border-b border-border px-4 py-3 sm:px-6">
@@ -236,6 +218,7 @@ export function ApiKeyWizard({ open, onComplete, onClose, theme = "dark", onTogg
         </DialogHeader>
 
         <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto p-4 sm:gap-4 sm:p-6">
+          {/* Fixed media area — same size every step */}
           <div className="relative aspect-video w-full shrink-0 overflow-hidden rounded-xl border border-border bg-muted">
             {current.media && current.mediaType ? (
               current.mediaType === "video" ? (
@@ -296,6 +279,7 @@ export function ApiKeyWizard({ open, onComplete, onClose, theme = "dark", onTogg
             </div>
           ) : null}
 
+          {/* Persistent CTAs */}
           <div className="flex shrink-0 flex-wrap gap-2">
             <Button
               className="h-11 flex-1"
@@ -313,6 +297,7 @@ export function ApiKeyWizard({ open, onComplete, onClose, theme = "dark", onTogg
             ) : null}
           </div>
 
+          {/* Prev / Next above progress */}
           <div className="mt-auto flex shrink-0 flex-col gap-3 pt-1">
             <div className="flex items-center justify-between gap-2">
               <Button
@@ -358,48 +343,48 @@ export function ApiKeyWizard({ open, onComplete, onClose, theme = "dark", onTogg
             </div>
           </div>
         </div>
-
-        {/* Fullscreen media — inside dialog so wizard stays open */}
-        {fullscreen && current.media && current.mediaType ? (
-          <div
-            className="absolute inset-0 z-50 flex items-center justify-center bg-black/95 p-4"
-            onClick={handleBackdropClick}
-            role="dialog"
-            aria-modal="true"
-            aria-label="Full screen media"
-          >
-            <button
-              type="button"
-              className="absolute right-3 top-3 z-10 flex h-11 w-11 items-center justify-center rounded-lg text-white hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
-              onClick={() => setFullscreen(false)}
-              aria-label="Close full screen"
-            >
-              <X className="size-6" />
-            </button>
-            <div className="max-h-full max-w-full">
-              {current.mediaType === "video" ? (
-                <video
-                  src={current.media}
-                  className="max-h-full max-w-full object-contain"
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                  controls
-                  onClick={(e) => e.stopPropagation()}
-                />
-              ) : (
-                <img
-                  src={current.media}
-                  alt=""
-                  className="max-h-full max-w-full object-contain"
-                  onClick={(e) => e.stopPropagation()}
-                />
-              )}
-            </div>
-          </div>
-        ) : null}
       </DialogContent>
+
+      {/* Fullscreen media overlay */}
+      {fullscreen && current.media && current.mediaType ? (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 p-4"
+          onClick={() => setFullscreen(false)}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Full screen media"
+        >
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="absolute right-4 top-4 h-10 w-10 p-0 text-white hover:bg-white/20"
+            onClick={() => setFullscreen(false)}
+            aria-label="Close full screen"
+          >
+            <X className="size-6" />
+          </Button>
+          <div className="max-h-full max-w-full" onClick={(e) => e.stopPropagation()}>
+            {current.mediaType === "video" ? (
+              <video
+                src={current.media}
+                className="max-h-[90vh] max-w-full object-contain"
+                autoPlay
+                muted
+                loop
+                playsInline
+                controls
+              />
+            ) : (
+              <img
+                src={current.media}
+                alt=""
+                className="max-h-[90vh] max-w-full object-contain"
+              />
+            )}
+          </div>
+        </div>
+      ) : null}
     </Dialog>
   );
 }
