@@ -188,7 +188,13 @@ export function ApiKeyWizard({ open, onComplete, onClose, theme = "dark", onTogg
     <Dialog
       open={open}
       onOpenChange={(next) => {
-        if (!next) onClose();
+        if (!next) {
+          if (fullscreen) {
+            setFullscreen(false);
+          } else {
+            onClose();
+          }
+        }
       }}
     >
       <DialogContent
