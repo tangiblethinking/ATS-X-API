@@ -361,6 +361,8 @@ export function HomePage() {
             setShowWelcome(false);
             setApiKeyDialogOpen(true);
           }}
+          theme={theme}
+          onToggleTheme={toggleTheme}
         />
         <ApiKeyWizard
           open={showWizard}
@@ -369,6 +371,8 @@ export function HomePage() {
             setShowWizard(false);
           }}
           onClose={() => setShowWizard(false)}
+          theme={theme}
+          onToggleTheme={toggleTheme}
         />
     </TooltipProvider>
   );

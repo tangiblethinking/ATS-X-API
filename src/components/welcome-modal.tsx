@@ -7,17 +7,22 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Moon, Sun } from "lucide-react";
 
 export const GOOGLE_SIGNUP =
   "https://accounts.google.com/lifecycle/steps/signup/name?continue=https://mail.google.com/mail/&dsh=S-163851725:1788464400734734&ec=asw-gmail-%5Bmodule%5D-create&flowEntry=SignUp&flowName=GlifWebSignIn&hl=en&service=mail&source=gafb-gmail_asw-hero-en&theme=glif&TL=ACv9tzESYKEKW7fhcOFZBLSrFGnCA7XfVdzruxJYQVZGCgiyY2Z3jwc5K8NxGH4n";
+
+type Theme = "dark" | "light";
 
 type Props = {
   open: boolean;
   onContinue: () => void;
   onEnterKey: () => void;
+  theme?: Theme;
+  onToggleTheme?: () => void;
 };
 
-export function WelcomeModal({ open, onContinue, onEnterKey }: Props) {
+export function WelcomeModal({ open, onContinue, onEnterKey, theme = "dark", onToggleTheme }: Props) {
   function openSignup() {
     window.open(GOOGLE_SIGNUP, "_blank", "noopener,noreferrer");
   }
@@ -31,7 +36,21 @@ export function WelcomeModal({ open, onContinue, onEnterKey }: Props) {
         onEscapeKeyDown={(e) => e.preventDefault()}
       >
         <DialogHeader>
-          <DialogTitle>Welcome, let’s get this machine set up!</DialogTitle>
+          <div className="flex items-start justify-between gap-2">
+            <DialogTitle>Welcome, let’s get this machine set up!</DialogTitle>
+            {onToggleTheme ? (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-9 w-9 shrink-0 p-0"
+                onClick={onToggleTheme}
+                aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+              >
+                {theme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}
+              </Button>
+            ) : null}
+          </div>
           <DialogDescription>
             This machine uses Gemini. Choose continue if you’re already signed in to your gmail account. Or create account if you need one. Or if your a Pro, select “enter api key”.
           </DialogDescription>
